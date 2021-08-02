@@ -43,32 +43,6 @@
   </entry>
   
   <entry>
-    <title>Unsupervised Attention-guided GAN</title>
-    <link href="http://example.com/2021/08/01/Unsupervised-Attention-guided/"/>
-    <id>http://example.com/2021/08/01/Unsupervised-Attention-guided/</id>
-    <published>2021-08-01T11:20:10.000Z</published>
-    <updated>2021-08-02T11:02:40.337Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation"><a href="#1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation" class="headerlink" title="1、论文全名 — Unsupervised Attention-guided Image-to-Image Translation"></a>1、论文全名 — Unsupervised Attention-guided Image-to-Image Translation</h1><h1 id="2、-emsp-整体结构"><a href="#2、-emsp-整体结构" class="headerlink" title="2、&emsp;整体结构"></a>2、&emsp;整体结构</h1><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627892637831.png" alt="1627892637831"></p><p>​                                                          <center>UAG-GAN流程图</center></p><h1 id="3、-emsp-UAG-GAN过程"><a href="#3、-emsp-UAG-GAN过程" class="headerlink" title="3、&emsp;UAG-GAN过程"></a>3、&emsp;UAG-GAN过程</h1><p>&emsp;&emsp;&emsp;文章出发点是在cycleGAN 的基础上改进的，图像风格变换实质上是两个不同域之间的相互转换。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627893141106.png" alt="1627893141106"></p><p>&emsp;&emsp;为了进一步处理，需要解决两个主要任务：</p><ol><li>在每个图像中定位要平移的区域，</li><li>对定位的区域应用正确的平移。</li></ol><h2 id="3-1-emsp-生成器G解读"><a href="#3-1-emsp-生成器G解读" class="headerlink" title="3.1 &emsp;生成器G解读"></a>3.1 &emsp;生成器G解读</h2><p>&emsp;&emsp;A_S与A_T表示两个不同的注意力网络，Sa 和 Ta分别是由 S 和 T 导出的注意图。每个注意力图包含每像素[0，1]的估计值。<strong>如果注意力图所有值为0，则输出背景项；如果全为1，则输出原图。</strong>将输入图像输入到生成器后，我们使用逐元素乘积将学习到的掩码应用到生成的图像，然后使用应用于输入图像的反遮罩添加背景。因此，A_S 和 A_T 与G一起训练，如图所示。</p><p>&emsp;&emsp;首先，我们将输入图像 s∈S 馈送到生成器F_(S→T), 生成器 F_(S→T)将s映射到目标域T，然后，将相同的输入馈送到注意力网络A_S，得到注意力图 Sa 。为了创建“前景”对象sf，我们把每个RGB通道上的注意力模型 Sa 和生成器F_(S→T)进行逐元素乘积。然后，对注意力图Sa取反，再和原图S进行逐元素成绩，得到“背景”图像Sb。最后，将前景和后景图相加即可得到最终图像。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627894572673.png" alt="1627894572673"></p><h2 id="3-2-emsp-损失函数"><a href="#3-2-emsp-损失函数" class="headerlink" title="3.2 &emsp;损失函数"></a>3.2 &emsp;损失函数</h2><p>&emsp;<strong>对抗损失：</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627895057172.png" alt="1627895057172"></p><p>&emsp;</p><p>&emsp;<strong>循环一致性损失：</strong>   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;其中 S‘’ 是生成的T域图片再转回S域的图像。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627895140042.png" alt="1627895140042"></p><p>&emsp;<strong>最终损失：</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901641560.png" alt="1627901641560"></p><p>&emsp;<strong>在整个实验中，我们通过求解极小极大优化问题得到L的最优参数:</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901652097.png" alt="1627901652097"></p><h2 id="3-3-emsp-判别器D解读"><a href="#3-3-emsp-判别器D解读" class="headerlink" title="3.3 &emsp;判别器D解读"></a>3.3 &emsp;判别器D解读</h2><p>&emsp;&emsp;生成器仅作用于关注区域: 随着注意力网络训练在寻找前景方面会变得更加准确。但是也有两个引起误差的行为：（1）注意力图慢慢的包括越来越多的背景，向完全关注的图收敛 (<strong>图中的所有值都收敛到1</strong>)。（2）生成器F_(S→T)将背景直接“绘制”到关注区域中.</p><p>&emsp;单纯用原图像S和通过<strong>已经训练好了的A_S生成的</strong>注意力图像Sa进行逐元素乘积是有问题的，因为反馈给鉴别器的真实样本现在依赖于最初未训练的注意力图sa。如果GAN中的所有网络都被联合训练，这将导致模式崩溃。为了克服这个问题，我们首先在30个时期的完整图像上训练辨别器，然后在注意力网络A_S和A_T发展起来后，切换到掩蔽图像。</p><p>图像转换的流程如图：</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627896930053.png" alt="1627896930053"></p><p>我们设置注意力取值不能为0，因为全0就变成了输出背景，故鉴别器设定学习注意图的阈值如下:</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901667458.png" alt="1627901667458"></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901532979.png" alt="1627901532979"></p><h2 id="3-3-总结学习FS→T的训练程序"><a href="#3-3-总结学习FS→T的训练程序" class="headerlink" title="3.3 总结学习FS→T的训练程序"></a>3.3 总结学习FS→T的训练程序</h2><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901540811.png" alt="1627901540811"></p><h1 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h1><p><strong>&emsp;&emsp;这篇文章引入了注意力、把一张图片的合成分成了前景图片和后景图片的合成、分别处理后再相加。这样可以使得更加专注于前景图，对需要转化部分图像的处理达到更好的效果。</strong></p><p><strong>&emsp;&emsp;有一个想法：直接用前景减去后景是不是能够让素描的合成更加准确。</strong></p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation&quot;&gt;&lt;a href=&quot;#1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-T</summary>
-      
-    
-    
-    
-    <category term="论文阅读（第一层级）" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/"/>
-    
-    <category term="GAN（第二层级" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/GAN%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%B1%82%E7%BA%A7/"/>
-    
-    
-    <category term="GAN，论文阅读" scheme="http://example.com/tags/GAN%EF%BC%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/"/>
-    
-  </entry>
-  
-  <entry>
     <title>StackGAN</title>
     <link href="http://example.com/2021/08/01/StackGAN/"/>
     <id>http://example.com/2021/08/01/StackGAN/</id>
@@ -88,6 +62,32 @@
     <category term="论文阅读（第一层级）" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/"/>
     
     <category term="GAN（第二层级）" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/GAN%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%B1%82%E7%BA%A7%EF%BC%89/"/>
+    
+    
+    <category term="GAN，论文阅读" scheme="http://example.com/tags/GAN%EF%BC%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Unsupervised Attention-guided GAN</title>
+    <link href="http://example.com/2021/08/01/Unsupervised-Attention-guided/"/>
+    <id>http://example.com/2021/08/01/Unsupervised-Attention-guided/</id>
+    <published>2021-08-01T11:20:10.000Z</published>
+    <updated>2021-08-02T11:02:40.337Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation"><a href="#1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation" class="headerlink" title="1、论文全名 — Unsupervised Attention-guided Image-to-Image Translation"></a>1、论文全名 — Unsupervised Attention-guided Image-to-Image Translation</h1><h1 id="2、-emsp-整体结构"><a href="#2、-emsp-整体结构" class="headerlink" title="2、&emsp;整体结构"></a>2、&emsp;整体结构</h1><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627892637831.png" alt="1627892637831"></p><p>​                                                          <center>UAG-GAN流程图</center></p><h1 id="3、-emsp-UAG-GAN过程"><a href="#3、-emsp-UAG-GAN过程" class="headerlink" title="3、&emsp;UAG-GAN过程"></a>3、&emsp;UAG-GAN过程</h1><p>&emsp;&emsp;&emsp;文章出发点是在cycleGAN 的基础上改进的，图像风格变换实质上是两个不同域之间的相互转换。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627893141106.png" alt="1627893141106"></p><p>&emsp;&emsp;为了进一步处理，需要解决两个主要任务：</p><ol><li>在每个图像中定位要平移的区域，</li><li>对定位的区域应用正确的平移。</li></ol><h2 id="3-1-emsp-生成器G解读"><a href="#3-1-emsp-生成器G解读" class="headerlink" title="3.1 &emsp;生成器G解读"></a>3.1 &emsp;生成器G解读</h2><p>&emsp;&emsp;A_S与A_T表示两个不同的注意力网络，Sa 和 Ta分别是由 S 和 T 导出的注意图。每个注意力图包含每像素[0，1]的估计值。<strong>如果注意力图所有值为0，则输出背景项；如果全为1，则输出原图。</strong>将输入图像输入到生成器后，我们使用逐元素乘积将学习到的掩码应用到生成的图像，然后使用应用于输入图像的反遮罩添加背景。因此，A_S 和 A_T 与G一起训练，如图所示。</p><p>&emsp;&emsp;首先，我们将输入图像 s∈S 馈送到生成器F_(S→T), 生成器 F_(S→T)将s映射到目标域T，然后，将相同的输入馈送到注意力网络A_S，得到注意力图 Sa 。为了创建“前景”对象sf，我们把每个RGB通道上的注意力模型 Sa 和生成器F_(S→T)进行逐元素乘积。然后，对注意力图Sa取反，再和原图S进行逐元素成绩，得到“背景”图像Sb。最后，将前景和后景图相加即可得到最终图像。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627894572673.png" alt="1627894572673"></p><h2 id="3-2-emsp-损失函数"><a href="#3-2-emsp-损失函数" class="headerlink" title="3.2 &emsp;损失函数"></a>3.2 &emsp;损失函数</h2><p>&emsp;<strong>对抗损失：</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627895057172.png" alt="1627895057172"></p><p>&emsp;</p><p>&emsp;<strong>循环一致性损失：</strong>   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;其中 S‘’ 是生成的T域图片再转回S域的图像。</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627895140042.png" alt="1627895140042"></p><p>&emsp;<strong>最终损失：</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901641560.png" alt="1627901641560"></p><p>&emsp;<strong>在整个实验中，我们通过求解极小极大优化问题得到L的最优参数:</strong></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901652097.png" alt="1627901652097"></p><h2 id="3-3-emsp-判别器D解读"><a href="#3-3-emsp-判别器D解读" class="headerlink" title="3.3 &emsp;判别器D解读"></a>3.3 &emsp;判别器D解读</h2><p>&emsp;&emsp;生成器仅作用于关注区域: 随着注意力网络训练在寻找前景方面会变得更加准确。但是也有两个引起误差的行为：（1）注意力图慢慢的包括越来越多的背景，向完全关注的图收敛 (<strong>图中的所有值都收敛到1</strong>)。（2）生成器F_(S→T)将背景直接“绘制”到关注区域中.</p><p>&emsp;单纯用原图像S和通过<strong>已经训练好了的A_S生成的</strong>注意力图像Sa进行逐元素乘积是有问题的，因为反馈给鉴别器的真实样本现在依赖于最初未训练的注意力图sa。如果GAN中的所有网络都被联合训练，这将导致模式崩溃。为了克服这个问题，我们首先在30个时期的完整图像上训练辨别器，然后在注意力网络A_S和A_T发展起来后，切换到掩蔽图像。</p><p>图像转换的流程如图：</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627896930053.png" alt="1627896930053"></p><p>我们设置注意力取值不能为0，因为全0就变成了输出背景，故鉴别器设定学习注意图的阈值如下:</p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901667458.png" alt="1627901667458"></p><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901532979.png" alt="1627901532979"></p><h2 id="3-3-总结学习FS→T的训练程序"><a href="#3-3-总结学习FS→T的训练程序" class="headerlink" title="3.3 总结学习FS→T的训练程序"></a>3.3 总结学习FS→T的训练程序</h2><p><img src="/2021/08/01/Unsupervised-Attention-guided/1627901540811.png" alt="1627901540811"></p><h1 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h1><p><strong>&emsp;&emsp;这篇文章引入了注意力、把一张图片的合成分成了前景图片和后景图片的合成、分别处理后再相加。这样可以使得更加专注于前景图，对需要转化部分图像的处理达到更好的效果。</strong></p><p><strong>&emsp;&emsp;有一个想法：直接用前景减去后景是不是能够让素描的合成更加准确。</strong></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-Translation&quot;&gt;&lt;a href=&quot;#1、论文全名-—-Unsupervised-Attention-guided-Image-to-Image-T</summary>
+      
+    
+    
+    
+    <category term="论文阅读（第一层级）" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/"/>
+    
+    <category term="GAN（第二层级" scheme="http://example.com/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/GAN%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%B1%82%E7%BA%A7/"/>
     
     
     <category term="GAN，论文阅读" scheme="http://example.com/tags/GAN%EF%BC%8C%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/"/>
