@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://example.com/2021/08/01/Unsupervised-Attention-guided/</loc>
+    
+    <lastmod>2021-08-03</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://example.com/2021/08/01/StackGAN-v2/</loc>
     
     <lastmod>2021-08-03</lastmod>
@@ -10,13 +17,6 @@
   
   <url>
     <loc>http://example.com/2021/08/03/MUNIT/</loc>
-    
-    <lastmod>2021-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://example.com/2021/08/01/Unsupervised-Attention-guided/</loc>
     
     <lastmod>2021-08-03</lastmod>
     
