@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-08-03T11:10:33.949Z</updated>
+  <updated>2021-08-03T11:15:35.808Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://example.com/2021/08/03/MUNIT/"/>
     <id>http://example.com/2021/08/03/MUNIT/</id>
     <published>2021-08-03T08:45:44.000Z</published>
-    <updated>2021-08-03T11:10:33.949Z</updated>
+    <updated>2021-08-03T11:15:35.808Z</updated>
     
     <content type="html"><![CDATA[<h1 id="1、论文全名-—-Multimodal-Unsupervised-Image-to-Image-Translation"><a href="#1、论文全名-—-Multimodal-Unsupervised-Image-to-Image-Translation" class="headerlink" title="1、论文全名 — Multimodal Unsupervised Image-to-Image Translation"></a>1、论文全名 — Multimodal Unsupervised Image-to-Image Translation</h1><h1 id="emsp-emsp-多模态无监督图像到图像翻译"><a href="#emsp-emsp-多模态无监督图像到图像翻译" class="headerlink" title="&emsp;&emsp;(多模态无监督图像到图像翻译)"></a>&emsp;&emsp;(多模态无监督图像到图像翻译)</h1><h1 id="2、整体结构"><a href="#2、整体结构" class="headerlink" title="2、整体结构"></a>2、整体结构</h1><p><img src="/2021/08/03/MUNIT/1627986033107.png" alt="1627986033107"></p><p><img src="/2021/08/03/MUNIT/1627980504738.png" alt="1627980504738"></p><h1 id="3、过程"><a href="#3、过程" class="headerlink" title="3、过程"></a>3、过程</h1><p>&emsp;&emsp;如图1 (a)所示，我们的框架做了几个假设。我们首先假设图像的潜在空间可以分解为内容空间C和风格空间S。我们进一步假设不同领域的图像共享一个共同的内容空间，但不共享样式空间。为了将图像翻译到目标域，我们将其内容代码与目标样式空间中的随机样式代码重新组合(图1(b))。</p><p>&emsp;&emsp;内容代码对翻译过程中应该保留的信息进行编码，而样式代码表示输入图像中不包含的其余变体。通过采样不同的风格代码，我们的模型能够产生不同的多模态输出。</p><p><img src="/2021/08/03/MUNIT/1627981675082.png" alt="1627981675082"></p><p>&emsp;&emsp;如图2(a)所示，每个自动编码器的潜在代码被分解成内容代码ci和样式代码si。如图2(b)所示，通过交换编码器-解码器对来执行图像到图像的转换。</p><p>&emsp;&emsp;为了将图像x1∈x1翻译成X2，我们首先提取其内容潜在代码<img src="/2021/08/03/MUNIT/1627982033272.png" alt="1627982033272" style="zoom:60%;">，并从先验分布<img src="/2021/08/03/MUNIT/1627982067523.png" alt="1627982067523" style="zoom:50%;">中随机绘制一个风格潜在代码s2。然后，我们使用G2产生最终输出图像<img src="/2021/08/03/MUNIT/1627982112763.png" alt="1627982112763" style="zoom:60%;">。</p><h2 id="4、损失函数设计"><a href="#4、损失函数设计" class="headerlink" title="4、损失函数设计"></a>4、损失函数设计</h2><h2 id="4-1-emsp-双向重建损失"><a href="#4-1-emsp-双向重建损失" class="headerlink" title="4.1&emsp;双向重建损失"></a>4.1&emsp;双向重建损失</h2><p><strong>图像重建损失:</strong> </p><p><img src="/2021/08/03/MUNIT/1627986277230.png" alt="1627986277230"></p><p><strong>潜在的重建损失：</strong>（内容重建损失和风格重建损失）</p><p><img src="/2021/08/03/MUNIT/1627986328694.png" alt="1627986328694"></p><p>在给定不同风格代码的情况下，风格重建损失具有鼓励不同输出的效果，内容重构损失重新鼓励翻译图像以保留输入图像的语义内容。</p><h2 id="4-2-emsp-对抗损失"><a href="#4-2-emsp-对抗损失" class="headerlink" title="4.2&emsp;对抗损失"></a>4.2&emsp;对抗损失</h2><p>先验分布<img src="/2021/08/03/MUNIT/1627987418253.png" alt="1627987418253" style="zoom:50%;">，边缘分布p(x）</p><p><img src="/2021/08/03/MUNIT/1627986915469.png" alt="1627986915469"></p><h2 id="4-3-emsp-总损失"><a href="#4-3-emsp-总损失" class="headerlink" title="4.3&emsp;总损失"></a>4.3&emsp;总损失</h2><img src="/2021/08/03/MUNIT/1627987289574.png" alt="1627987289574" style="zoom:75%;"><img src="/2021/08/03/MUNIT/1627987296909.png" alt="1627987296909" style="zoom:75%;"><h1 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h1><p>&emsp;&emsp;<strong>网络设计有点复杂，思路很容易理解。将图片分成风格编码器和内容编码器，然后拆开编码，最后再进行组合，同一个内容可以混合不同的风格。设计损失函数的时候也有重建风格损失，重建内容损失。</strong></p><hr>]]></content>
     
