@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>有三AI文章阅读3---度量和fGAN | lllllcy</title><meta name="keywords" content="GAN"><meta name="author" content="George"><meta name="copyright" content="George"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1.分布间的距离最初提出的GAN是基于博弈论角度的，它包括一个判别器和一个生成器，判别器会给出输入的样本来源于训练集的概率，而生成器会努力产生可以欺骗判别器的样本。整个GAN的流程稍微复杂却非常具象，甚至可以将其拟人化来理解。其实，更一般地，我们应该从样本概率分布的角度去理解GAN，从这里入手虽然略微抽象，但是能触碰到GAN的本质。 GAN的生成器隐式地定义了一个概率分布，并依此概率分布来生成样本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有三AI文章阅读3---度量和fGAN">
+<meta property="og:url" content="http://example.com/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/index.html">
+<meta property="og:site_name" content="lllllcy">
+<meta property="og:description" content="1.分布间的距离最初提出的GAN是基于博弈论角度的，它包括一个判别器和一个生成器，判别器会给出输入的样本来源于训练集的概率，而生成器会努力产生可以欺骗判别器的样本。整个GAN的流程稍微复杂却非常具象，甚至可以将其拟人化来理解。其实，更一般地，我们应该从样本概率分布的角度去理解GAN，从这里入手虽然略微抽象，但是能触碰到GAN的本质。 GAN的生成器隐式地定义了一个概率分布，并依此概率分布来生成样本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images4.alphacoders.com/678/678317.jpg">
+<meta property="article:published_time" content="2021-09-02T09:10:00.000Z">
+<meta property="article:modified_time" content="2021-09-02T12:02:40.779Z">
+<meta property="article:author" content="George">
+<meta property="article:tag" content="GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images4.alphacoders.com/678/678317.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '有三AI文章阅读3---度量和fGAN',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-09-02 20:02:40'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="lllllcy" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/mann.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images4.alphacoders.com/678/678317.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">lllllcy</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">有三AI文章阅读3---度量和fGAN</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-09-02T09:10:00.000Z" title="发表于 2021-09-02 17:10:00">2021-09-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-09-02T12:02:40.779Z" title="更新于 2021-09-02 20:02:40">2021-09-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/">论文阅读（第一层级）</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/GAN%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%B1%82%E7%BA%A7%EF%BC%89/">GAN（第二层级）</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="有三AI文章阅读3---度量和fGAN"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="1-分布间的距离"><a href="#1-分布间的距离" class="headerlink" title="1.分布间的距离"></a>1.分布间的距离</h3><p>最初提出的GAN是基于博弈论角度的，它包括一个判别器和一个生成器，判别器会给出输入的样本来源于训练集的概率，而生成器会努力产生可以欺骗判别器的样本。整个GAN的流程稍微复杂却非常具象，甚至可以将其拟人化来理解。其实，更一般地，我们应该从样本概率分布的角度去理解GAN，从这里入手虽然略微抽象，但是能触碰到GAN的本质。</p>
+<p>GAN的生成器隐式地<strong>定义了一个概率分布，并依此概率分布来生成样本</strong>，而训练样本集也是在某一个概率分布上连续独立采样获得的，故GAN的目标就是：<strong>驱使生成器定义的隐式的概率分布接近训练样本集的本质概率分布。</strong></p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630574460321.png" alt="1630574460321" style="zoom:80%;">
+
+<p> 不同的概率密度函数之间距离有“远近之分”，如下图中黄色分布和蓝色分布的距离比较近，而红色分布和蓝色分布的距离比较远，我们需要定义度量函数来量化分布之间的距离（将两个概率密度函数映射为一个实数）。 </p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630574717452.png" alt="1630574717452" style="zoom:67%;">
+
+<p> <strong>在向量空间中，将每一个向量视为一个元素，存在许多种两个元素间距离的度量方式</strong>，比如闵科夫斯基距离、欧式距离、曼哈顿距离、切比雪夫距离等。<strong>类似的，将每一个概率分布视为概率密度函数空间中的一个元素，则可以定义元素之间的距离</strong>。需要注意定义的距离需要满足<strong>非负性、对称性、三角不等式</strong>。 </p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630578559510.png" alt="1630578559510" style="zoom:80%;">
+
+<h3 id="2-f-divergence"><a href="#2-f-divergence" class="headerlink" title="2.f-divergence"></a><strong>2.f-divergence</strong></h3><p>f-divergence则提供了一套“距离”，对于数据集的本质概率分布和生成器隐式的概率分布，我们用以下公式来定义它们的距离：</p>
+<p><img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630578582159.svg" alt="[公式]"></p>
+<p><img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630578582181.svg" alt="[公式]"></p>
+<p>其中要求，<strong>f(u)为凸函数，且f(1)=0。f(1)=0保证了当两个分布完全重合时，f散度为0</strong>。<strong>f(u)为凸函数保证了f-divergence的值非负</strong>。我们用Jensen不等式来简单证明一下：</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation.svg" alt="[公式]" style="zoom:80%;">
+
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630578582210.svg" alt="[公式]" style="zoom:80%;">
+
+<p>f散度中f(u)的具体形式如下图所示：</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/v2-7eb64e734be348f3b452bd6e4d5fac3e_720w.jpg" alt="img" style="zoom: 58%;">
+
+
+
+<h3 id="3-共轭函数"><a href="#3-共轭函数" class="headerlink" title="3.共轭函数"></a>3.共轭函数</h3><p>即使知道了f散度的一般表达式，我们也无法精确计算其值。</p>
+<p>我们利用共轭函数将f散度转变成可以计算的形式。<strong>共轭（或对偶）通常指成对出现的两个具有很强关系的实体，它们具有相同的结构和意义</strong>。<strong>无论原函数是否是凸函数，其共轭函数必为凸函数</strong>（凸函数在做优化时拥有非常好的数学性质）。</p>
+<p>定义共轭函数为</p>
+<p><img src="https://www.zhihu.com/equation?tex=f(u)=%5Cmax_%7Bt%5Cin+f%27(D)%7D%5C%7Btu-g(t)%5C%7D%5C%5C" alt="[公式]"> </p>
+<p> t的定义域为f(u)的一阶导数的值域。即对于任意给定的u，要遍历所有可能的t代入计算，然后寻找最大值。 </p>
+<p>此时f散度可转化为</p>
+<p><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D+D_f(p_%7Bdata%7D%5Cparallel+p_g)&=%5Cint_x+p_g(x)f(%5Cfrac%7Bp_%7Bdata%7D(x)%7D%7Bp_g(x)%7D)dx%5C%5C+&=%5Cint_x+p_g(x)%5B%5Cmax_%7Bt%5Cin+f%27(D)%7D%5C%7Bt%5Cfrac%7Bp_%7Bdata%7D(x)%7D%7Bp_g(x)%7D-g(t)%5C%7D%5Ddx%5C%5C+&=%5Cint_x%5Cmax_%7Bt%5Cin+f%27(D)%7D%5Btp_%7Bdata%7D(x)-g(t)p_g(x)%5Ddx%5C%5C+&%5Cgeq%5Cmax_%7Bt%5Cin+f%27(D)%7D%5Cint_x%5Btp_%7Bdata%7D(x)-g(t)p_g(x)%5Ddx%5C%5C+%5Cend%7Baligned%7D%5C%5C" alt="[公式]"></p>
+<p> t和u具有非常复杂的数学解析关系，则t和x也具有非常复杂的数学解析关系，即使用共轭函数给出了f散度的一个下界，依然无法写成解析式而利用蒙特卡洛方法求解。利用神经网络强大的函数拟合能力，可以构造一个神经网络来拟合t和x的复杂函数关系，即 <img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630579742308.svg" alt="[公式]"> ，这里要注意通过设置最后一层的激活函数以保证神经网络的输出在f(u)的一阶导数的值域中。 </p>
+<p><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D+&%5Cmax_%7Bt%5Cin+f%27(D)%7D%5Cint_x%5Btp_%7Bdata%7D(x)-g(t)p_g(x)%5Ddx%5C%5C+=&%5Cmax_%7B%5Ctheta%7D%5Cint_xp_%7Bdata%7D(x)T_%7B%5Ctheta%7D(x)-p_g(x)g(T_%7B%5Ctheta%7D(x))dx%5C%5C+=&%5Cmax_%7B%5Ctheta%7D%5Cmathbb%7BE%7D_%7Bx%5Csim+p_%7Bdata%7D%7D%5BT_%7B%5Ctheta%7D(x)%5D-%5Cmathbb%7BE%7D_%7Bx%5Csim+p_g%7D%5Bg(T_%7B%5Ctheta%7D(x))%5D+%5Cend%7Baligned%7D%5C%5C" alt="[公式]"> </p>
+<p>所以，对于这个神经网络T，我们应该以</p>
+<p><img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630579839033.svg" alt="[公式]"></p>
+<p>为目标函数通过采样的方式进行训练，将求极值的问题转化成训练神经网络的问题，理论上，经过完美的训练，上述目标函数即转化成了f散度。所以在fGAN的框架下来看，训练判别器本质上是为了逼近一个f散度，然后利用f散度去指示生成器的学习。从现在开始，判别器已经不再像最原始的GAN拥有具象的意义了。</p>
+ <img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/v2-f9310de8170c172ddcc336725f64f5b0_720w.jpg" alt="img" style="zoom:80%;"> 
+
+<h3 id="4-几个小问题"><a href="#4-几个小问题" class="headerlink" title="4.几个小问题"></a>4.几个小问题</h3><p>KL散度和逆KL散度在严格意义上并不是一种度量，因为不符合对称性，即</p>
+<p><img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630581634007.svg" alt="[公式]"></p>
+<p>非对称性意味着使用KL散度或者逆KL散度作为优化目标，其得到结果将具有显著差异。例如，用分布Q去拟合分布P，选择KL散度，Q会将诸多高概率的峰模糊化，</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630581689827.png" alt="1630581689827" style="zoom: 50%;">
+
+<p>如若使用逆KL散度，则会导致Q去拟合高概率的单峰。</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630581711341.png" alt="1630581711341" style="zoom:50%;">
+
+<p>另一个需要解释的问题，为什么JS散度效果不好。因为训练集的概率分布和生成器隐式定义的概率分布往往只是高维空间的低维流形，例如在三维空间中，两个分布均是二维流形，其交集最多为一条直线，以至于在计算JS散度时可以忽略。</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/1630581740276.png" alt="1630581740276" style="zoom:50%;">
+
+<p>即对于任意x，在绝大部分情况下，两个概率分布至少有一个为0。</p>
+<img src="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB4/equation-1630581634060.svg" alt="[公式]" style="zoom: 67%;">
+
+<p>显然，这样计算得来的JS散度为常数。所以如果将判别器训练的太好（即学习到了JS散度）但JS散度为一个常数，无法提供任何梯度信息供生成器训练，就是大家常说的“学不动”。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GAN/">GAN</a></div><div class="post_share"><div class="social-share" data-image="https://images4.alphacoders.com/678/678317.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/09/02/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB5/"><img class="next-cover" src="https://images4.alphacoders.com/678/678317.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">有三AI文章阅读3---对偶与WGAN</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/08/14/代码流程解读/" title="解读第四阶段素描GAN代码"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-08-14</div><div class="title">解读第四阶段素描GAN代码</div></div></a></div><div><a href="/2021/08/29/归一化/" title="归一化"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-08-29</div><div class="title">归一化</div></div></a></div><div><a href="/2021/09/02/有三AI文章阅读/" title="有三AI文章阅读1---GAN原理"><img class="cover" src="https://images4.alphacoders.com/678/678317.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-02</div><div class="title">有三AI文章阅读1---GAN原理</div></div></a></div><div><a href="/2021/09/02/有三AI文章阅读2/" title="有三AI文章阅读2---GAN五个基本结构"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-02</div><div class="title">有三AI文章阅读2---GAN五个基本结构</div></div></a></div><div><a href="/2021/09/02/有三AI文章阅读3/" title="有三AI文章阅读3---生成模型和GAN"><img class="cover" src="https://images4.alphacoders.com/678/678317.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-02</div><div class="title">有三AI文章阅读3---生成模型和GAN</div></div></a></div><div><a href="/2021/09/02/有三AI文章阅读5/" title="有三AI文章阅读3---对偶与WGAN"><img class="cover" src="https://images4.alphacoders.com/678/678317.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-02</div><div class="title">有三AI文章阅读3---对偶与WGAN</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%86%E5%B8%83%E9%97%B4%E7%9A%84%E8%B7%9D%E7%A6%BB"><span class="toc-number">1.</span> <span class="toc-text">1.分布间的距离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-f-divergence"><span class="toc-number">2.</span> <span class="toc-text">2.f-divergence</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%85%B1%E8%BD%AD%E5%87%BD%E6%95%B0"><span class="toc-number">3.</span> <span class="toc-text">3.共轭函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%87%A0%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">4.几个小问题</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('https://images4.alphacoders.com/678/678317.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2021 By George</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">努力努力再努力!!!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
