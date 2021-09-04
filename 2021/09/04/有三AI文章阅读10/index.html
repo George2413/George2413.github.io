@@ -1,0 +1,285 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>有三AI文章阅读10---从动力学视角看GAN以及一致优化 | lllllcy</title><meta name="keywords" content="GAN训练"><meta name="author" content="George"><meta name="copyright" content="George"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1.相关知识先不谈GAN，先介绍一个特别重要的与动力学收敛性相关的命题，考虑一个如下形式的函数：   其中h大于0。有这样一个命题：如果存在一个比较特殊的点（不动点）使得：   而且在该不动点，函数F(x)的雅可比矩阵F’(x)的所有特征值（非对称矩阵的特征值为复数）的绝对值均小于1，则从该不动点的一小邻域内的任意一点开始，使用如下形式的数值迭代法：   则F最终会收敛至：   为了直观一些，上述">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有三AI文章阅读10---从动力学视角看GAN以及一致优化">
+<meta property="og:url" content="http://example.com/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/index.html">
+<meta property="og:site_name" content="lllllcy">
+<meta property="og:description" content="1.相关知识先不谈GAN，先介绍一个特别重要的与动力学收敛性相关的命题，考虑一个如下形式的函数：   其中h大于0。有这样一个命题：如果存在一个比较特殊的点（不动点）使得：   而且在该不动点，函数F(x)的雅可比矩阵F’(x)的所有特征值（非对称矩阵的特征值为复数）的绝对值均小于1，则从该不动点的一小邻域内的任意一点开始，使用如下形式的数值迭代法：   则F最终会收敛至：   为了直观一些，上述">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images8.alphacoders.com/864/864900.png">
+<meta property="article:published_time" content="2021-09-04T06:20:00.000Z">
+<meta property="article:modified_time" content="2021-09-04T08:49:26.234Z">
+<meta property="article:author" content="George">
+<meta property="article:tag" content="GAN训练">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images8.alphacoders.com/864/864900.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '有三AI文章阅读10---从动力学视角看GAN以及一致优化',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-09-04 16:49:26'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="lllllcy" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/mann.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images8.alphacoders.com/864/864900.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">lllllcy</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">有三AI文章阅读10---从动力学视角看GAN以及一致优化</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-09-04T06:20:00.000Z" title="发表于 2021-09-04 14:20:00">2021-09-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-09-04T08:49:26.234Z" title="更新于 2021-09-04 16:49:26">2021-09-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GAN%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/">GAN（第一层级）</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GAN%EF%BC%88%E7%AC%AC%E4%B8%80%E5%B1%82%E7%BA%A7%EF%BC%89/%E7%9F%A5%E4%B9%8E%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%B1%82%E7%BA%A7%EF%BC%89/">知乎文章阅读（第二层级）</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="有三AI文章阅读10---从动力学视角看GAN以及一致优化"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1-相关知识"><a href="#1-相关知识" class="headerlink" title="1.相关知识"></a><strong>1.相关知识</strong></h2><p>先不谈GAN，先介绍一个特别重要的与动力学收敛性相关的命题，考虑一个如下形式的函数：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532489.svg" alt="[公式]"> </p>
+<p>其中h大于0。有这样一个命题：如果存在一个比较特殊的点（<strong>不动点</strong>）使得：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532486.svg" alt="[公式]"> </p>
+<p>而且在该不动点，函数F(x)的雅可比矩阵F’(x)的所有特征值（非对称矩阵的特征值为复数）的绝对值均小于1，则从该不动点的一小邻域内的任意一点开始，使用如下形式的数值迭代法：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532643.svg" alt="[公式]"> </p>
+<p>则F最终会收敛至：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532599.svg" alt="[公式]"> </p>
+<p>为了直观一些，上述的数值迭代过程其实是在使用数值迭代的方式求：y=x和y=x+hG(x)两个函数的交点，如下示意：</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630738544913.png" alt="1630738544913" style="zoom: 50%;">
+
+<p>非常难得有一个好的关于收敛性的结论，而且其数值迭代的方式与实际的GAN训练方式也吻合，我们考虑将GAN对接到这个结论中。</p>
+<p>我们将生成器和判别器的目标函数均写成max的形式：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738752284.svg" alt="[公式]"></p>
+<p>那么对应于第一小节的式子，x对应为GAN的参数：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738752241.svg" alt="[公式]"></p>
+<p>而 <strong>h 可以对应为训练时候的学习速率</strong>，而G(x)则对应为矢量场v：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738752290.svg" alt="[公式]"></p>
+<p>这样看来，就是<strong>使用同时梯度下降法进行参数更新</strong>（由于将目标函数写成max形式，准确来说是梯度上升法）：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738752296.svg" alt="[公式]"></p>
+<p>将一般形式与GAN对接起来后，再次考虑之前关于收敛性的结论，便是：<strong>如果存在满足如下形式的点（即不动点）</strong></p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738752287.svg" alt="[公式]"></p>
+<p>并且在不动点，矢量场v的雅可比矩阵的所有特征值的绝对值均小于1<strong>（在不动点，v=0，即梯度为0），</strong>则从该不动点的某一个邻域内任意一点开始迭代，则最终进入收敛状态。<strong>（那么我们可以对GAN的训练过程进行“检查”，当出现一个梯度为0的参数点时，“检查”其矢量场的雅可比矩阵的特征值是否都在单位圆内，如果在则GAN的迭代最终会收敛进该点。）</strong></p>
+<h2 id="2-对接GAN"><a href="#2-对接GAN" class="headerlink" title="2.对接GAN"></a>2.对接GAN</h2><p><font size="4">雅可比矩阵：   jacobi描述输入的每个维度上的分量对输出上每个的分量的结果贡献度 </font></p>
+<p> 雅克比矩阵是由偏导数组成的,偏导数对应各个自变量前的系数,这些系数组合在一起就是向量,雅克比矩阵每一列都是一个向量. </p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630739426535.png" alt="1630739426535" style="zoom:67%;">
+
+<p>在纳什均衡点处，其雅可比矩阵是负定的。</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738993496.svg" alt="[公式]" style="zoom:76%;">
+
+<p>反过来，<font color="red"><strong>可以通过检查雅可比矩阵的性质来判断是否达到了局部收敛，如果在某个点，其一阶导数为0，且其雅可比矩阵为半负定矩阵，则该点为纳什均衡点。</strong></font></p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738993512.svg" alt="[公式]"></p>
+<p>我们知道半负定矩阵的特征值均小于等于0，则：<strong>如果在某一点的雅可比矩阵的特征值为负实数，则在足够小的学习速率的前提下，训练过程收敛；如果特征值出现复数，则训练一般而言不会实现局部收敛；如果复数特征值的实部很小而虚部比较大，此时需要要求非常高的学习速率才能达到收敛状态。</strong></p>
+<h2 id="3-特征值分析"><a href="#3-特征值分析" class="headerlink" title="3.特征值分析"></a>3.特征值分析</h2><p>训练GAN要找到梯度为0似乎不是那么困难，但是实现第二个条件：在不动点的矢量场v的雅可比矩阵的所有特征值的绝对值均小于1 可能比较困难，我们来详细分析一下。考虑一般情况下的表达式：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630740229725.svg" alt="[公式]"></p>
+<p>F(x)的雅可比矩阵为：</p>
+<p><img src="https://www.zhihu.com/equation?tex=F%27(x)=I+hG%27(x)%5C%5C+" alt="[公式]"></p>
+<p>对其进行特征值分解，单位矩阵I的特征值是实数1，而考虑到一般情况下另外两个矩阵是非对称矩阵，则其特征值必然是复数，设G’(x)分解出的特征值为：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630740229729.svg" alt="[公式]"> </p>
+<p>则F’(x)的分解出的特征值为</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630740229870.svg" alt="[公式]"> </p>
+<p>如下所示：</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630740247619.png" alt="1630740247619" style="zoom: 60%;">
+
+<p>特征值很容易跑出到单位圆之外<strong>。要保证其绝对值小于1（即在单位圆里），首先要保证a小于0</strong>，(a大于等于0时，该条件不可能满足)，如下所示：</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630740270304.png" alt="1630740270304" style="zoom: 50%;">
+
+<p>即G’(x)分解出的特征值的实部为负数，此时：</p>
+<p><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D+&%5B(1+ha)+hb%5C+i%5D%5B(1+ha)-hb%5C+i%5D%3C1%5C%5C+%5CLeftrightarrow+&+h%3C%5Cfrac%7B1%7D%7B%5Cmid+a+%5Cmid%7D%5Cfrac%7B2%7D%7B1+(b/a)%5E2%7D+%5Cend%7Baligned%7D%5C%5C" alt="[公式]"></p>
+<p>也就是说，<strong>要想进入收敛状态，特征值的实部要为负数，且同时要求学习速率h一定要足够小</strong>！其上界取决于特征值。但是这里有一个矛盾点，如果你将学习速率设置得太小，你的训练时长将会变得特别长。</p>
+<p>同样地，在GAN中，需要保证矢量场v的雅可比矩阵</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630740229915.svg" alt="[公式]"></p>
+<p>的所有特征值的实部为负数。<strong>但是实际中，这个条件是不太可能达到的，尤其是存在实部几乎为0而虚部的值比较大的情况，而且学习速率要设置的足够小。</strong></p>
+<p>注意到矢量场v的雅可比矩阵是与生成器和判别器的目标函数f、g相关的，<strong>考虑调整一下f和g，使得在不动点处的特征值的实部为负数。</strong></p>
+<h2 id="4-一致优化"><a href="#4-一致优化" class="headerlink" title="4.一致优化"></a>4.一致优化</h2><h3 id="4-1-emsp-基本概念"><a href="#4-1-emsp-基本概念" class="headerlink" title="4.1&emsp;基本概念"></a>4.1&emsp;基本概念</h3><p>一致优化(Conseensus Optimization)是一种理论上比较好的方法，它做了一点“手脚”使得特征值的实部尽量为负数。先考虑一般的形式：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233747.svg" alt="[公式]"> </p>
+<p>其中， γ 大于0，A为可逆矩阵，表达式为：</p>
+<p><img src="https://www.zhihu.com/equation?tex=A(x)=I-%5Cgamma+G%27(x)%5E%5Cmathrm%7BT%7D%5C%5C" alt="[公式]"> </p>
+<p>严谨起见，需要说明一下：如果某个x是</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233746.svg" alt="[公式]"> </p>
+<p>的一个不动点，则该x也是</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233747.svg" alt="[公式]"> </p>
+<p>的不动点，这里并没有因为在式子中添加A(x)而影响了不动点，之前可能在哪里收敛，之后还是可能在那个点收敛。而且在该不动点，</p>
+<p><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D+F%27(x)&=I+h(A%27(x)G(x)+A(x)G%27(x))%5C%5C+=&I+hA(x)G%27(x)%5C%5C+=&I+h%5B(I-%5Cgamma+G%27(x)%5E%7B%5Cmathrm%7BT%7D%7D)G%27(x)%5D%5C%5C+=&I+hG%27(x)-h%5Cgamma+G%27(x)%5E%7B%5Cmathrm%7BT%7D%7DG%27(x)+%5Cend%7Baligned%7D%5C%5C" alt="[公式]"></p>
+<p>可以看出，相比于第3部分的表达式，<strong>新增加的一项会使得特征值向实数部的负数方向偏移</strong>（新增项为负定矩阵，其特征值必然为负实数），如图所示</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630741458983.png" alt="1630741458983" style="zoom:50%;">
+
+<p>如果超参数γ设置比较合理，“有希望”保证特征值均落在单位圆内。</p>
+<p>现在，我们将上述方式对接到GAN中，将生成器和判别器的目标函数修改为：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233649.svg" alt="[公式]"></p>
+<p>其中， <img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233733.svg" alt="[公式]"></p>
+<p>可以写成如下形式：</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233763.svg" alt="[公式]" style="zoom: 80%;">
+
+<p>化简可有：</p>
+<img src="https://www.zhihu.com/equation?tex=%5Cleft%28++%5Cbegin%7Bmatrix%7D++%5Ctheta_G+%5C%5C++%5Ctheta_D+%5C%5C+++%5Cend%7Bmatrix%7D+++%5Cright%29%3A%3D%5Cleft%28++%5Cbegin%7Bmatrix%7D++%5Ctheta_G+%5C%5C++%5Ctheta_D+%5C%5C+++%5Cend%7Bmatrix%7D+++%5Cright%29%2Bh+v%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29+-%5Cgamma+v%27%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29%5E%7B%5Cmathrm%7BT%7D%7Dv%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29+%5C%5C" alt="[公式]" style="zoom:80%;">
+
+<p>其雅可比矩阵的表达式为：</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630741692748.png" alt="1630741692748" style="zoom:80%;">
+
+<p>根据之前的结论，如果γ设置比较合理，学习速率h足够小，则其特征值均会落入单位圆内，参数会进入不动点，也就是说进入纳什均衡的状态。</p>
+<p><strong>最后说明一下，一般GAN中，生成器和判别器的目标函数符号是相反的，但是我们同时对它们增加相同符号的正则项，在正则项部分上，它们的优化目标是一致的，故为一致优化。</strong></p>
+<h3 id="4-2-emsp-具体数学表达"><a href="#4-2-emsp-具体数学表达" class="headerlink" title="4.2&emsp;具体数学表达"></a>4.2&emsp;具体数学表达</h3><p>一致优化以标准的GAN+一致优化正则项为例，其损失函数的表达式为：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630745097746.svg" alt="[公式]"></p>
+<p>在Dirac-GAN中，对应的损失函数成为：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630745097664.svg" alt="[公式]"></p>
+<p>相应的动力学系统：</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630745097667.svg" alt="[公式]"></p>
+<p>结果有点复杂，但是确实在Dirac-GAN中精确收敛至(0,0)：</p>
+<p>实际情况中必须保证学习速率要足够小，才可能收敛。</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630745362356.png" alt="1630745362356" style="zoom:67%;">
+
+
+
+
+
+<h2 id="个人理解："><a href="#个人理解：" class="headerlink" title="个人理解："></a>个人理解：</h2><p>如果存在一个不动点，而且在该不动点，函数F(x)的雅可比矩阵F’(x)的<strong>所有特征值的绝对值均小于1</strong>，则从该不动点的一小邻域内的任意一点开始，使用欧拉法进行迭代，则 F 最终会收敛到这个点</p>
+<p>&emsp;&emsp;<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532489.svg" alt="[公式]"> </p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630738532486.svg" alt="[公式]"> </p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630743130041.png" alt="1630743130041" style="zoom: 80%;">
+
+<p>但是想让所有特征值的绝对值均小于1，不太容易实现，因为它本来就是一个复数的形式。所以我们可以让实部为负数并且h尽可能小，这样有可能让数值在单位圆内，即特征值小于1。h在GAN中表示学习了。</p>
+<p>但是<strong>所有</strong>特征值的实部为负数。但是实际中，这个条件是不太可能达到的。</p>
+<p><img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630740247619.png" alt="1630740247619" style="zoom: 45%;">                    <img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630740270304.png" alt="1630740270304" style="zoom: 40%;"></p>
+<p>所以我们使用一致优化方法，本质上是在这个特征值的实部加一个负数，让a+这个负数小于0。</p>
+<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630741458983.png" alt="1630741458983" style="zoom:45%;">
+
+<p>具体实现方法： 乘以一项A（X），其中， γ 大于0，A为可逆矩阵，</p>
+<p>&emsp;&emsp;<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/equation-1630741233747.svg" alt="[公式]">   </p>
+<p><img src="https://www.zhihu.com/equation?tex=A(x)=I-%5Cgamma+G%27(x)%5E%5Cmathrm%7BT%7D%5C%5C" alt="[公式]"></p>
+<p>化简：</p>
+<img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D+F%27%28x%29%26%3DI%2Bh%28A%27%28x%29G%28x%29%2BA%28x%29G%27%28x%29%29%5C%5C+%3D%26I%2BhA%28x%29G%27%28x%29%5C%5C+%3D%26I%2Bh%5B%28I-%5Cgamma+G%27%28x%29%5E%7B%5Cmathrm%7BT%7D%7D%29G%27%28x%29%5D%5C%5C+%3D%26I%2BhG%27%28x%29-h%5Cgamma+G%27%28x%29%5E%7B%5Cmathrm%7BT%7D%7DG%27%28x%29+%5Cend%7Baligned%7D%5C%5C" alt="[公式]">
+
+
+
+<p>F(x)转换为GAN 的形式后：<img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630743811696.png" alt="1630743811696" style="zoom: 80%;"></p>
+<p>化简结果如下：   <img src="https://www.zhihu.com/equation?tex=%5Cleft%28++%5Cbegin%7Bmatrix%7D++%5Ctheta_G+%5C%5C++%5Ctheta_D+%5C%5C+++%5Cend%7Bmatrix%7D+++%5Cright%29%3A%3D%5Cleft%28++%5Cbegin%7Bmatrix%7D++%5Ctheta_G+%5C%5C++%5Ctheta_D+%5C%5C+++%5Cend%7Bmatrix%7D+++%5Cright%29%2Bh+v%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29+-%5Cgamma+v%27%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29%5E%7B%5Cmathrm%7BT%7D%7Dv%28%7B%5Ctheta_G%7D%2C%7B%5Ctheta_D%7D%29+%5C%5C" alt="[公式]" style="zoom:80%;"></p>
+<p>其雅可比矩阵的表达式为：    <img src="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB10/1630741692748.png" alt="1630741692748" style="zoom:80%;"></p>
+<p><font size="5"><font color="red">如果γ设置比较合理，学习速率h足够小，则其特征值均会落入单位圆内，参数会进入不动点，也就是说进入纳什均衡的状态。</font></font></p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GAN%E8%AE%AD%E7%BB%83/">GAN训练</a></div><div class="post_share"><div class="social-share" data-image="https://images8.alphacoders.com/864/864900.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/09/04/%E6%9C%89%E4%B8%89AI%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB11/"><img class="prev-cover" src="https://images8.alphacoders.com/864/864900.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">有三AI文章阅读11---解决模式崩溃的目标函数</div></div></a></div><div class="next-post pull-right"><a href="/2021/09/04/%E8%AE%AD%E7%BB%83%E6%8A%80%E5%B7%A7/"><img class="next-cover" src="https://images8.alphacoders.com/864/864900.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ResNet</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/09/04/有三AI文章阅读11/" title="有三AI文章阅读11---解决模式崩溃的目标函数"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-04</div><div class="title">有三AI文章阅读11---解决模式崩溃的目标函数</div></div></a></div><div><a href="/2021/09/04/有三AI文章阅读12/" title="有三AI文章阅读12---解决模式崩溃的框架"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-04</div><div class="title">有三AI文章阅读12---解决模式崩溃的框架</div></div></a></div><div><a href="/2021/09/03/有三AI文章阅读9/" title="有三AI文章阅读9---几个训练小技巧"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-03</div><div class="title">有三AI文章阅读9---几个训练小技巧</div></div></a></div><div><a href="/2021/09/03/有三AI文章阅读8/" title="有三AI文章阅读8---GAN训练遇到的问题"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-03</div><div class="title">有三AI文章阅读8---GAN训练遇到的问题</div></div></a></div><div><a href="/2021/09/03/有三AI阅读13/" title="有三AI文章阅读13---mini-batch discriminator"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-03</div><div class="title">有三AI文章阅读13---mini-batch discriminator</div></div></a></div><div><a href="/2021/09/04/训练技巧/" title="ResNet"><img class="cover" src="https://images8.alphacoders.com/864/864900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-09-04</div><div class="title">ResNet</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">1.相关知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E6%8E%A5GAN"><span class="toc-number">2.</span> <span class="toc-text">2.对接GAN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%89%B9%E5%BE%81%E5%80%BC%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">3.特征值分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%B8%80%E8%87%B4%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">4.一致优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-emsp-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-emsp-%E5%85%B7%E4%BD%93%E6%95%B0%E5%AD%A6%E8%A1%A8%E8%BE%BE"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 具体数学表达</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3%EF%BC%9A"><span class="toc-number">5.</span> <span class="toc-text">个人理解：</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('https://images8.alphacoders.com/864/864900.png')"><div id="footer-wrap"><div class="copyright">&copy;2021 By George</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">努力努力再努力!!!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
